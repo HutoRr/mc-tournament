@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tournament Roster Clocks</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #10b981;
+            --accent-hover: #059669;
+            --placeholder: #475569;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .clocks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .clock-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3);
+            border: 2px solid #334155;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+            .clock-card:hover {
+                transform: translateY(-2px);
+                border-color: var(--accent);
+            }
+
+            .clock-card.empty-slot {
+                border-style: dashed;
+                border-color: var(--placeholder);
+                opacity: 0.7;
+            }
+
+                .clock-card.empty-slot:hover {
+                    border-color: var(--text-muted);
+                }
+
+        .player-name {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--accent);
+            margin-bottom: 0.25rem;
+            word-break: break-word;
+            line-height: 1.2;
+        }
+
+        .empty-slot .player-name {
+            color: var(--text-muted);
+        }
+
+        .zone-info {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            font-family: monospace;
+        }
+
+        .time {
+            font-size: 2.5rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            color: var(--text-main);
+            margin-top: auto;
+            line-height: 1;
+        }
+
+        .date {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>The Noobs</h1>
+            <div class="subtitle">Live local times for coordination</div>
+        </header>
+
+        <div class="clocks-grid" id="clocks-container">
+        </div>
+    </div>
+
+    <script>
+        const tournamentRoster = [
+            {
+                playerName: "HutoRr",
+                timezone: "Europe/Kyiv"
+            },
+            {
+                playerName: "Eagle",
+                timezone: "Asia/Karachi"
+            },
+            {
+                playerName: "Antonius1000",
+                timezone: "Europe/Berlin"
+            },
+            {
+                playerName: "[Open Slot 4]",
+                timezone: "UTC"
+            },
+            {
+                playerName: "[Open Slot 5]",
+                timezone: "UTC"
+            },
+            {
+                playerName: "[Open Slot 6]",
+                timezone: "UTC"
+            },
+            {
+                playerName: "[Open Slot 7]",
+                timezone: "UTC"
+            },
+            {
+                playerName: "[Open Slot 8]",
+                timezone: "UTC"
+            }
+        ];
+
+        const container = document.getElementById('clocks-container');
+
+        function renderCards() {
+            container.innerHTML = '';
+
+            tournamentRoster.forEach((player, index) => {
+                const card = document.createElement('div');
+                const isOpenSlot = player.playerName.includes("[Open Slot");
+                card.className = `clock-card ${isOpenSlot ? 'empty-slot' : ''}`;
+
+                card.innerHTML = `
+                        <div class="player-name">${player.playerName}</div>
+                        <div class="zone-info">📍 ${player.timezone.replace(/_/g, ' ')}</div>
+                        <div class="time" id="time-${index}">00:00:00</div>
+                        <div class="date" id="date-${index}">---</div>
+                    `;
+                container.appendChild(card);
+            });
+
+            updateTime();
+        }
+
+        function updateTime() {
+            const now = new Date();
+
+            tournamentRoster.forEach((player, index) => {
+                const timeEl = document.getElementById(`time-${index}`);
+                const dateEl = document.getElementById(`date-${index}`);
+
+                if (timeEl && dateEl) {
+                    try {
+                        timeEl.textContent = now.toLocaleTimeString('en-US', {
+                            timeZone: player.timezone,
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit',
+                            hour12: true
+                        });
+
+                        dateEl.textContent = now.toLocaleDateString('en-US', {
+                            timeZone: player.timezone,
+                            weekday: 'long',
+                            month: 'short',
+                            day: 'numeric'
+                        });
+                    } catch (e) {
+                        timeEl.textContent = "Invalid Zone";
+                        timeEl.style.fontSize = "1.5rem";
+                        timeEl.style.color = "#ef4444";
+                        dateEl.textContent = "Check timezone spelling";
+                    }
+                }
+            });
+        }
+
+        renderCards();
+        setInterval(updateTime, 1000);
+    </script>
+</body>
+</html>
