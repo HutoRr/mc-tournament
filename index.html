@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tournament Roster Clocks</title>
+    <title>Tournament Teammate Clocks</title>
     <style>
         :root {
             --bg-color: #0f172a;
@@ -144,8 +144,8 @@
                 timezone: "Europe/Berlin"
             },
             {
-                playerName: "[Open Slot 4]",
-                timezone: "UTC"
+                playerName: "Noob12347842",
+                timezone: "America/New_York"
             },
             {
                 playerName: "[Open Slot 5]",
@@ -176,11 +176,11 @@
                 card.className = `clock-card ${isOpenSlot ? 'empty-slot' : ''}`;
 
                 card.innerHTML = `
-                        <div class="player-name">${player.playerName}</div>
-                        <div class="zone-info">📍 ${player.timezone.replace(/_/g, ' ')}</div>
-                        <div class="time" id="time-${index}">00:00:00</div>
-                        <div class="date" id="date-${index}">---</div>
-                    `;
+                            <div class="player-name">${player.playerName}</div>
+                            <div class="zone-info">📍 ${player.timezone.replace(/_/g, ' ')}</div>
+                            <div class="time" id="time-${index}">00:00:00</div>
+                            <div class="date" id="date-${index}">---</div>
+                        `;
                 container.appendChild(card);
             });
 
